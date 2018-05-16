@@ -45,7 +45,7 @@ log_path = 'output/'
 auth_message = ''
 session_active_message = ''
 
-# The message to send to the websocket
+# The message to send to the websocket (after fuzzing)
 message = ''
 
 # When fuzzing `message` ignore these tokens. The tokens are part of the original
@@ -61,7 +61,7 @@ ignore_tokens = []
 # The list containing messages to be sent to the websocket. In some cases
 # You need to send two or more messages to set a specific remote state, and
 # then you send the attack
-init_messages = []
+init_messages = [auth_message]
 
 # The messages to be fuzzed, these are sent in different websocket connections
 # after sending the `init_messages`.
@@ -69,7 +69,7 @@ init_messages = []
 # Each message is fuzzed using `create_tokenized_messages`. This tokenizer
 # function, together with `replace_token_in_json` needs to be customized
 # if your websocket messages are NOT JSON.
-original_messages = []
+original_messages = [message]
 
 # When doing analysis of the websocket responses to try to identify exceptions
 # and other errors, ignore these errors since they are common for the
