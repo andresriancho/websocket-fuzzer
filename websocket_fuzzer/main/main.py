@@ -25,12 +25,17 @@ def fuzz_websockets(ws_address, init_messages, original_messages, session_active
 
     :param ws_address: The websocket address to connect and send messages to
 
-    :param init_messages: The login messages to send before any payloads
+    :param init_messages: The login messages to send before any payloads.
+                          This parameter accepts a serialized message (a string) or a
+                          function that will generate the string when called.
+
     :param session_active_message: Wait for this message after sending the init_messages. Usually
                                    This is the message that says: "Login successful". Use None if
                                    there are no messages to wait for.
 
     :param original_messages: The original messages to be fuzzed
+                              This parameter accepts a serialized message (a string) or a
+                              function that will generate the string when called.
 
     :param ignore_tokens: When generating messages with payloads, do not replace these parts
                           of the message. In general you want to set this list to all the

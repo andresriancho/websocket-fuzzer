@@ -124,10 +124,32 @@ class FuzzingApp(websocket.WebSocketApp):
     def on_close(self, ws_conn):
         self.log('/closed')
 
+    def serialize_message(self, message):
+        """
+        This method gives the fuzzer support for using functions as messages.
+        The function will be called to generate the message.
+
+        :param message: A string with the message, or a function that generates
+                        the message to send to the wire.
+
+        :return: A string with the message
+        """
+        if callable(message):
+            return message()
+
+        return message
+
+    def get_first_message(self):
+        return self.serialize_message(self.messages_to_send[0])
+
+    def iterate_all_messages_except_first(self):
+        for message in self.messages_to_send[1:]:
+            yield self.serialize_message(message)
+
     def on_open(self, ws_conn):
         logging.debug('Connection success!')
 
-        self.send_message(self.messages_to_send[0])
+        self.send_message(self.get_first_message())
 
         t = threading.Thread(target=self.wait_for_login_and_send_payload,)
         t.start()
@@ -142,7 +164,7 @@ class FuzzingApp(websocket.WebSocketApp):
             time.sleep(0.1)
 
             spent_time = time.time() - start_timestamp
-            if spent_time > 10:
+            if spent_time > 5:
                 logging.debug('Timed out waiting for answers')
                 break
 
@@ -161,7 +183,7 @@ class FuzzingApp(websocket.WebSocketApp):
         wait_for_active_session = self.session_active_message is not None
         self.wait_for_pending_messages(wait_for_active_session=wait_for_active_session)
 
-        for message in self.messages_to_send[1:]:
+        for message in self.iterate_all_messages_except_first():
             # Send the payload(s)
             self.send_message(message, analyze=True)
 
