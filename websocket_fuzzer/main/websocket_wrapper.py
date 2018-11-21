@@ -142,7 +142,7 @@ class FuzzingApp(websocket.WebSocketApp):
             time.sleep(0.1)
 
             spent_time = time.time() - start_timestamp
-            if spent_time > 30:
+            if spent_time > 10:
                 logging.debug('Timed out waiting for answers')
                 break
 
