@@ -14,7 +14,7 @@ from termcolor import colored
 
 from websocket import WebSocketConnectionClosedException
 from websocket_fuzzer.analysis.response_analyzer import analyze_response
-
+from websocket_fuzzer.main.websocket_logfile import WebSocketLogFile
 
 OUTGOING = 'outgoing'
 INCOMING = 'incoming'
@@ -35,7 +35,7 @@ class FuzzingApp(websocket.WebSocketApp):
         self._id = self._id.lower()
 
         log_filename = self._id
-        self.log_file = file('%s/%s.log' % (log_path, log_filename), 'w')
+        self.log_file = WebSocketLogFile(log_path, log_filename)
 
         self.messages_to_send = messages_to_send
         self.messages_pending_response = 0
