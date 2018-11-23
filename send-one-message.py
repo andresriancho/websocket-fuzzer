@@ -3,8 +3,6 @@ import logging
 
 from websocket_fuzzer.main.websocket_wrapper import send_payloads_in_websocket
 
-from messages import *
-
 #
 #   Configure logging
 #
@@ -29,26 +27,32 @@ logging.getLogger('').addHandler(console)
 #       ws://localhost
 #       wss://localhost
 #
-ws_address = 'wss://ic2acts3.adobeconnect.adobe.com/'
+ws_address = ''
 
 # The proxy server used to send the messages. This is very useful
 # for debugging the tools
 http_proxy_host = 'localhost'
-http_proxy_port = '8082'
+http_proxy_port = '8080'
 
 # Log path, all messages are logged in different files
 log_path = 'output/'
+
+# Websocket authentication message. The tool will send the authentication
+# message (if included in messages below) and wait for `session_active_message`
+# before sending `message`
+auth_message = ''
+session_active_message = ''
+
+# The message to send to the websocket
+message = ''
 
 # The list containing all messages to be sent to the websocket. In some cases
 # You need to send two or more messages to set a specific remote state, and
 # then you send the attack
 messages = [
     auth_message,
-    get_stats,
-    call_layout_method,
-    get_stats,
+    message,
 ]
-#messages.extend(html5_app_messages)
 
 # When doing analysis of the websocket responses to try to identify exceptions
 # and other errors, ignore these errors since they are common for the
