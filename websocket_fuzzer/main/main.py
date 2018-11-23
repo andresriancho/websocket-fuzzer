@@ -59,12 +59,17 @@ def fuzz_websockets(ws_address, init_messages, original_messages, session_active
 
         for original_message in original_messages:
 
+            # TODO: Not sure if this is the best place to call the original_message
+            #       function, but I need to get the message string to be able to
+            #       tokenize it and fuzz it...
+            original_message = serialize_message(original_message)
+
             logging.info('Fuzzing message: %s' % original_message)
             tokenized_messages = create_tokenized_messages(original_message, ignore_tokens)
 
             bar = Bar('Processing', max=len(tokenized_messages) * payload_count)
 
-            for tokenized_message in tokenized_messages:
+            for tokenized_count, tokenized_message in enumerate(tokenized_messages):
 
                 for payload in file(PAYLOADS):
 
@@ -79,8 +84,14 @@ def fuzz_websockets(ws_address, init_messages, original_messages, session_active
                     messages_to_send.append(modified_message)
 
                     ex.submit(send_payloads_in_websocket,
-                              ws_address, messages_to_send, session_active_message,
-                              ignore_errors, output, http_proxy_host, http_proxy_port)
+                              ws_address,
+                              messages_to_send,
+                              session_active_message,
+                              ignore_errors,
+                              tokenized_count,
+                              output,
+                              http_proxy_host,
+                              http_proxy_port)
 
             bar.finish()
 
@@ -95,3 +106,19 @@ def replace_token_in_json(payload, tokenized_message):
     # Do the replace
     modified_message = tokenized_message.replace(TOKEN, payload)
     return modified_message
+
+
+def serialize_message(message):
+    """
+    This method gives the fuzzer support for using functions as messages.
+    The function will be called to generate the message.
+
+    :param message: A string with the message, or a function that generates
+                    the message to send to the wire.
+
+    :return: A string with the message
+    """
+    if callable(message):
+        return message()
+
+    return message

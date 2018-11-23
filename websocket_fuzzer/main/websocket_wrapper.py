@@ -21,7 +21,8 @@ INCOMING = 'incoming'
 
 
 class FuzzingApp(websocket.WebSocketApp):
-    def __init__(self, ws_address, messages_to_send, ignore_errors, log_path, session_active_message, *args, **kwargs):
+    def __init__(self, ws_address, messages_to_send, ignore_errors, tokenized_count,
+                 log_path, session_active_message, *args, **kwargs):
 
         # Just ignore the kwargs passed as parameter and use ours:
         kwargs = {'on_message': self.on_message,
@@ -35,7 +36,7 @@ class FuzzingApp(websocket.WebSocketApp):
         self._id = self._id.lower()
 
         log_filename = self._id
-        self.log_file = WebSocketLogFile(log_path, log_filename)
+        self.log_file = WebSocketLogFile(tokenized_count, log_path, log_filename)
 
         self.messages_to_send = messages_to_send
         self.messages_pending_response = 0
@@ -200,9 +201,15 @@ class FuzzingApp(websocket.WebSocketApp):
 
 
 def send_payloads_in_websocket(ws_address, messages_to_send, session_active_message,
-                               ignore_errors, log_path, http_proxy_host, http_proxy_port):
+                               ignore_errors, tokenized_count, log_path,
+                               http_proxy_host, http_proxy_port):
 
-    ws = FuzzingApp(ws_address, messages_to_send, ignore_errors, log_path, session_active_message)
+    ws = FuzzingApp(ws_address,
+                    messages_to_send,
+                    ignore_errors,
+                    tokenized_count,
+                    log_path,
+                    session_active_message)
     ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE},
                    http_proxy_host=http_proxy_host,
                    http_proxy_port=http_proxy_port)
