@@ -66,6 +66,7 @@ send_payloads_in_websocket(ws_address,
                            messages,
                            session_active_message,
                            ignore_errors,
+                           0,
                            log_path,
                            http_proxy_host,
                            http_proxy_port)
